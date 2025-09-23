@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const items = [
   { img: "haircut.png", title: "Haircut" },
@@ -6,7 +7,7 @@ const items = [
   { img: "manicure.png", title: "Manicure" },
   { img: "pedicure.png", title: "Pedicure" },
   { img: "massage.png", title: "Massage" },
-  { img: "skin-care.png", title: "Skin Care" },
+  { img: "skin-care.png", title: "SkinCare" },
 ];
 
 export default function Services() {
@@ -27,15 +28,15 @@ export default function Services() {
           <div className="row g-4 g-md-0 text-center">
             {items.map((s, i) => (
               <div className="col-md-6 col-lg-4" key={s.title}>
-                <div className={`service-item h-100 p-4 border-bottom ${i%3!==2 ? "border-end":""}`}>
+                <div className={`service-item h-100 p-4 border-bottom ${i % 3 !== 2 ? "border-end" : ""}`}>
                   <img className="img-fluid" src={`/assets/img/${s.img}`} alt={s.title} />
                   <h3 className="mb-3">{s.title}</h3>
                   <p className="mb-3">
                     Clita erat ipsum et lorem et sit, sed stet no labore lorem sit clita duo justo.
                   </p>
-                  <a className="btn btn-sm btn-primary text-uppercase" href="#!">
-                    Read More <i className="bi bi-arrow-right"></i>
-                  </a>
+                  <Link to={`/${s.title.toLowerCase()}`} className="btn btn-sm btn-primary text-uppercase">
+                    Book Now <i className="bi bi-arrow-right"></i>
+                  </Link>
                 </div>
               </div>
             ))}
