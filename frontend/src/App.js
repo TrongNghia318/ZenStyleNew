@@ -23,12 +23,14 @@ import SkinCare from "./pages/page_Sevice/SkinCare";
 
 // Admin/Dashboard pages
 import AdminProductCreate from "./pages/AdminProductCreate";
-// import DashboardHome from "./pages/dashboard/DashboardHome";
+
 import ServicesPage from "./pages/Dashboard_pages/ServicesPage";
 import UsersManagement from "./pages/Dashboard_pages/UsersManagement";
-
-// Protected Route component
-// import ProtectedRoute from "./components/ProtectedRoute";
+import ProductsManagement from "./pages/Dashboard_pages/ProductsManagement";
+import ProtectedRoute from "./components/ProtectedRoute";
+import DashboardProductDetail from "./pages/Dashboard_pages/DashboardProductDetail";
+import DashboardProductCreate from "./pages/Dashboard_pages/DashboardProductCreate";
+import OrderTracking from "./pages/Dashboard_pages/OrderTracking";
 
 function App() {
   return (
@@ -45,7 +47,7 @@ function App() {
           <Route path="contact" element={<Contact />} />
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<Signup />} />
-          
+
           {/* Service booking routes */}
           <Route path="services/haircut" element={<Haircut />} />
           <Route path="services/makeup" element={<Makeup />} />
@@ -53,20 +55,24 @@ function App() {
           <Route path="services/pedicure" element={<Pedicure />} />
           <Route path="services/massage" element={<Massage />} />
           <Route path="services/skincare" element={<SkinCare />} />
-          
+
           {/* Admin product creation (with auth check inside component) */}
           <Route path="admin/products/create" element={<AdminProductCreate />} />
         </Route>
 
         Dashboard routes with dashboard layout
         <Route path="/dashboard" element={
-         
+          <ProtectedRoute requireStaff={true}>
             <DashboardLayout />
-          
+          </ProtectedRoute>
         }>
           {/* <Route index element={<DashboardHome />} /> */}
           <Route path="services" element={<ServicesPage />} />
           <Route path="users" element={<UsersManagement />} />
+          <Route path="products" element={<ProductsManagement />} />
+          <Route path="products/:id" element={<DashboardProductDetail />} />
+          <Route path="products/create" element={<DashboardProductCreate />} />
+          <Route path="/dashboard/orders" element={<OrderTracking />} />
         </Route>
 
         {/* 404 route */}

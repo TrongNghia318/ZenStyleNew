@@ -140,11 +140,21 @@ if ($authenticatedUser instanceof \App\Models\Client) {
         return response()->json(['order' => $order]);
     }
 
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+ public function update(Request $request, string $id)
+{
+    $request->validate([
+        'status' => 'required|string|in:pending,paid,cancelled'
+    ]);
 
+    $order = Order::findOrFail($id);
+    $order->status = $request->status;
+    $order->save();
+    
+    return response()->json([
+        'message' => 'Order status updated successfully',
+        'order' => $order->load(['client', 'user', 'orderDetails.inventory'])
+    ]);
+}
     public function destroy(string $id)
     {
         //

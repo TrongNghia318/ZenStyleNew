@@ -18,6 +18,8 @@ Route::get('/user', function (Request $request) {
 // Public product routes (everyone can view - including guests)
 Route::get('products', [InventoryController::class, 'index']);
 Route::get('products/{id}', [InventoryController::class, 'show']);
+Route::put('orders/{id}', [OrderController::class, 'update']);
+
 
 // Public routes
 Route::get('feedbacks', [FeedbackController::class, 'index']);

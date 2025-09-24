@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import "./css/auth.css";
 
 export default function Login() {
@@ -10,6 +10,10 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Get the page user was trying to access before being redirected to login
+  const from = location.state?.from?.pathname || null;
 
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -78,13 +82,14 @@ export default function Login() {
         // Trigger auth change event
         window.dispatchEvent(new Event('auth-change'));
 
-        alert(`Chào mừng khách hàng: ${clientResult.data.client.name}!`);
-        navigate("/"); // dùng navigate thay cho window.location.href
+        alert(`Welcome customer: ${clientResult.data.client.name}!`);
+        
+        // Clients go to home page or where they came from
+        navigate(from || "/");
         return;
       }
 
-
-      // If Client login fails, try User login
+      // If Client login fails, try User/Staff login
       const userResult = await attemptLogin(
         'http://127.0.0.1:8000/api/user/login',
         loginData,
@@ -98,27 +103,35 @@ export default function Login() {
 
         window.dispatchEvent(new Event('auth-change'));
 
-        alert(`Chào mừng nhân viên: ${userResult.data.user.name} (${userResult.data.user.role})!`);
-        navigate("/"); // Cũng nên đổi từ window.location.href
+        alert(`Welcome staff: ${userResult.data.user.name} (${userResult.data.user.role})!`);
+        
+        // Staff members go to dashboard if they were trying to access it, otherwise home
+        if (from && from.startsWith('/dashboard')) {
+          navigate(from);
+        } else {
+          // Default dashboard redirect for staff
+          navigate("/dashboard/services");
+        }
         return;
       }
 
       // Both failed - show error
       if (clientResult.status === 401 && userResult.status === 401) {
-        setErrors({ general: "Email/Phone hoặc mật khẩu không đúng" });
+        setErrors({ general: "Email/Phone or password is incorrect" });
       } else if (clientResult.error || userResult.error) {
-        setErrors({ general: "Lỗi kết nối. Vui lòng thử lại." });
+        setErrors({ general: "Connection error. Please try again." });
       } else {
-        setErrors({ general: "Đăng nhập thất bại" });
+        setErrors({ general: "Login failed" });
       }
 
     } catch (error) {
       console.error("Login error:", error);
-      setErrors({ general: "Lỗi hệ thống. Vui lòng thử lại." });
+      setErrors({ general: "System error. Please try again." });
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <div className="container py-5">
       <div className="auth-card card p-4 p-md-5">
@@ -207,7 +220,7 @@ export default function Login() {
 
           <div className="text-center my-3">
             <small className="text-muted">
-              Hệ thống tự động phân biệt tài khoản khách hàng và nhân viên
+              System automatically detects customer and staff accounts
             </small>
           </div>
 

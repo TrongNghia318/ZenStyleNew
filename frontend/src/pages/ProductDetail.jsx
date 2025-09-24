@@ -376,7 +376,7 @@ function ProductDetail() {
       {isAuthenticated && (
         <div style={{ backgroundColor: '#f8f9fa', padding: '10px', textAlign: 'center', borderBottom: '1px solid #dee2e6' }}>
           <small>
-            Viewing as: <strong>{userType === 'user' ? 'Staff' : 'Customer'}</strong>
+           
             {canManageProducts && <span style={{ color: 'green' }}> • Can manage products</span>}
             {isEditing && <span style={{ color: 'orange' }}> • EDITING MODE</span>}
           </small>

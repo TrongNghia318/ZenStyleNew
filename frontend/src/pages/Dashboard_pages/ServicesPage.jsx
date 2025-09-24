@@ -11,6 +11,8 @@ function ServicesManagement() {
     }, []);
 
     const fetchBookings = async () => {
+        setIsLoading(true);
+        setError(null);
         try {
             const token = localStorage.getItem('auth_token');
             const response = await fetch('http://127.0.0.1:8000/api/bookings', {
@@ -26,8 +28,14 @@ function ServicesManagement() {
             
             const data = await response.json();
             setBookings(data);
+            
+            // Show success feedback for manual refresh
+            if (!isLoading) {
+                console.log('Bookings refreshed successfully');
+            }
         } catch (err) {
             setError(err.message);
+            console.error('Error fetching bookings:', err);
         } finally {
             setIsLoading(false);
         }
@@ -81,9 +89,17 @@ function ServicesManagement() {
         return `${formattedTime} (${period})`;
     };
 
+    // Fixed container style to prevent sidebar overlap
+    const containerStyle = {
+        position: 'relative',
+        left: '250px',
+        width: 'calc(100vw - 250px)',
+        paddingRight: '15px'
+    };
+
     if (isLoading) {
         return (
-            <div className="container-fluid p-4" style={{ marginLeft: '250px' }}>
+            <div className="container-fluid p-4" style={containerStyle}>
                 <div className="d-flex justify-content-center align-items-center" style={{ height: '50vh' }}>
                     <div className="spinner-border text-primary" role="status">
                         <span className="visually-hidden">Loading...</span>
@@ -95,7 +111,7 @@ function ServicesManagement() {
 
     if (error) {
         return (
-            <div className="container-fluid p-4" style={{ marginLeft: '250px' }}>
+            <div className="container-fluid p-4" style={containerStyle}>
                 <div className="alert alert-danger">
                     Error: {error}
                     <button className="btn btn-sm btn-outline-primary ms-2" onClick={fetchBookings}>
@@ -107,7 +123,7 @@ function ServicesManagement() {
     }
 
     return (
-        <div className="container-fluid p-4" style={{ marginLeft: '250px' }}>
+        <div className="container-fluid p-4" style={containerStyle}>
             <h1 className="mb-4">Booking Management</h1>
 
             <div className="row">
@@ -139,8 +155,16 @@ function ServicesManagement() {
                                 onClick={fetchBookings}
                                 disabled={isLoading}
                             >
-                                <i className="bi bi-arrow-clockwise me-1"></i>
-                                Refresh
+                                {isLoading ? (
+                                    <>
+                                        <span className="spinner-border spinner-border-sm me-1" role="status"></span>
+                                        Refreshing...
+                                    </>
+                                ) : (
+                                    <>
+                                        Refresh
+                                    </>
+                                )}
                             </button>
                         </div>
                         <div className="card-body p-0">
@@ -157,7 +181,7 @@ function ServicesManagement() {
                                             <th>Date</th>
                                             <th>Time</th>
                                             <th>Notes</th>
-                                            <th>Actions</th>
+                                            <th style={{ minWidth: '120px' }}>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -189,20 +213,23 @@ function ServicesManagement() {
                                                         <small>{booking.notes || '-'}</small>
                                                     </td>
                                                     <td>
-                                                        <div className="btn-group" role="group">
+                                                        {/* Fixed button styling with proper Bootstrap classes */}
+                                                        <div className="btn-group btn-group-sm" role="group">
                                                             <button
-                                                                className="btn btn-sm btn-outline-warning"
+                                                                type="button"
+                                                                className="btn btn-warning"
                                                                 onClick={() => handleEditClick(booking)}
                                                                 title="Edit booking"
                                                             >
-                                                                <i className="bi bi-pencil"></i>
+                                                                ✏️
                                                             </button>
                                                             <button
-                                                                className="btn btn-sm btn-outline-danger"
+                                                                type="button"
+                                                                className="btn btn-danger"
                                                                 onClick={() => handleDeleteBooking(booking.id)}
                                                                 title="Delete booking"
                                                             >
-                                                                <i className="bi bi-trash"></i>
+                                                                🗑️
                                                             </button>
                                                         </div>
                                                     </td>

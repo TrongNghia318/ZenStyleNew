@@ -1,19 +1,17 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-// Removed bootstrap-icons import - using existing icons from your project
 
 function Sidebar() {
     const navigate = useNavigate();
 
     const handleLogout = async () => {
-        const token = localStorage.getItem('auth_token'); // FIXED: was 'token', now 'auth_token'
+        const token = localStorage.getItem('auth_token');
         if (!token) {
             navigate('/login');
             return;
         }
 
         try {
-            // Use the existing endpoint from your backend
             await fetch('http://127.0.0.1:8000/api/user/logout', {
                 method: 'POST',
                 headers: {
@@ -24,7 +22,6 @@ function Sidebar() {
         } catch (err) {
             console.error("Logout failed:", err);
         } finally {
-            // Clear all auth data
             localStorage.removeItem('auth_token');
             localStorage.removeItem('user_data');
             localStorage.removeItem('client_data');
@@ -44,9 +41,32 @@ function Sidebar() {
             {/* Navigation links */}
             <ul className="nav nav-pills flex-column mb-auto">
                 <li className="nav-item mb-2">
-                    <NavLink to="/dashboard/services" className="nav-link text-white d-flex align-items-center">
+                    <NavLink 
+                        to="/dashboard/services" 
+                        className="nav-link text-white d-flex align-items-center"
+                    >
                         <i className="bi bi-gear-fill me-2 fs-5"></i>
                         <span>Service Management</span>
+                    </NavLink>
+                </li>
+                
+                <li className="nav-item mb-2">
+                    <NavLink 
+                        to="/dashboard/products" 
+                        className="nav-link text-white d-flex align-items-center"
+                    >
+                        <i className="bi bi-box-seam me-2 fs-5"></i>
+                        <span>Product Management</span>
+                    </NavLink>
+                </li>
+
+                <li className="nav-item mb-2">
+                    <NavLink 
+                        to="/dashboard/orders" 
+                        className="nav-link text-white d-flex align-items-center"
+                    >
+                        <i className="bi bi-truck me-2 fs-5"></i>
+                        <span>Order Tracking</span>
                     </NavLink>
                 </li>
             </ul>
