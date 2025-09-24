@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BookingsController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\ClientAuthController;
 use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\FeedbackController;
+use App\Http\Controllers\Api\AdminUserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,17 +19,8 @@ Route::get('/user', function (Request $request) {
 Route::get('products', [InventoryController::class, 'index']);
 Route::get('products/{id}', [InventoryController::class, 'show']);
 
-// Admin/Staff only product management routes
-Route::middleware(['auth:sanctum', 'role:admin,receptionist'])->group(function () {
-    Route::post('products', [InventoryController::class, 'store']);
-    Route::put('products/{id}', [InventoryController::class, 'update']);
-    Route::patch('products/{id}', [InventoryController::class, 'update']);
-    Route::delete('products/{id}', [InventoryController::class, 'destroy']);
-    
-    // Product images management (admin/staff only)
-    Route::post('products/{id}/images', [InventoryController::class, 'addImage']);
-    Route::delete('products/{id}/images/{imageId}', [InventoryController::class, 'deleteImage']);
-});
+// Public routes
+Route::get('feedbacks', [FeedbackController::class, 'index']);
 
 // User authentication (for staff members)
 Route::prefix('user')->group(function () {
@@ -51,43 +44,68 @@ Route::prefix('client')->group(function () {
     });
 });
 
-// Protected routes - require authentication
-Route::middleware('auth:sanctum')->group(function () {
-    // Orders API
-    Route::get('orders', [OrderController::class, 'index'])->middleware('role:admin,receptionist,stylist');
-    Route::get('orders/{id}', [OrderController::class, 'show']);
-    Route::post('orders', [OrderController::class, 'store']);
+// Admin/Staff only routes
+Route::middleware(['auth:sanctum', 'role:admin,receptionist,stylist'])->group(function () {
+    // Dashboard stats
+    Route::get('admin/dashboard/stats', [AdminUserController::class, 'getDashboardStats']);
     
-    // Feedbacks
-    Route::post('feedbacks', [FeedbackController::class, 'store']);
+    // Product management (admin/receptionist only)
+    Route::middleware('role:admin,receptionist')->group(function () {
+        Route::post('products', [InventoryController::class, 'store']);
+        Route::put('products/{id}', [InventoryController::class, 'update']);
+        Route::patch('products/{id}', [InventoryController::class, 'update']);
+        Route::delete('products/{id}', [InventoryController::class, 'destroy']);
+        
+        // Product images management
+        Route::post('products/{id}/images', [InventoryController::class, 'addImage']);
+        Route::delete('products/{id}/images/{imageId}', [InventoryController::class, 'deleteImage']);
+    });
+    
+    // Booking management - all staff can manage
+    Route::apiResource('bookings', BookingsController::class);
+    
+    // Order viewing - all staff can view orders
+    Route::get('orders', [OrderController::class, 'index']);
+    Route::get('orders/{id}', [OrderController::class, 'show']);
+    
+    // User management (admin/receptionist only)
+    Route::middleware('role:admin,receptionist')->group(function () {
+        Route::get('admin/staff', [AdminUserController::class, 'getStaffUsers']);
+        Route::get('admin/clients', [AdminUserController::class, 'getClients']);
+        Route::put('admin/clients/{id}', [AdminUserController::class, 'updateClient']);
+    });
+    
+    // Staff management (admin only)
+    Route::middleware('role:admin')->group(function () {
+        Route::post('admin/staff', [AdminUserController::class, 'createStaff']);
+        Route::put('admin/staff/{id}', [AdminUserController::class, 'updateStaff']);
+        Route::delete('admin/staff/{id}', [AdminUserController::class, 'deleteStaff']);
+    });
 });
-
-// Public routes
-Route::get('feedbacks', [FeedbackController::class, 'index']);
 
 // Cart routes (client only)
 Route::middleware(['auth:sanctum', 'client.only'])->group(function () {
-    Route::apiResource('cart', CartController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::get('cart', [CartController::class, 'index']);
+    Route::post('cart', [CartController::class, 'store']);
+    Route::put('cart/{id}', [CartController::class, 'update']);
+    Route::delete('cart/{id}', [CartController::class, 'destroy']);
     Route::delete('cart/clear', [CartController::class, 'clear']);
 });
 
-
-// Protected routes - require authentication
+// Mixed routes (both staff and clients can access)
 Route::middleware('auth:sanctum')->group(function () {
-    // Orders API
-    Route::get('orders', [OrderController::class, 'index'])->middleware('role:admin,receptionist,stylist');
-    Route::get('orders/{id}', [OrderController::class, 'show']);
+    // Orders - clients can create, staff can view all
     Route::post('orders', [OrderController::class, 'store']);
+    Route::get('orders/{id}', [OrderController::class, 'show']);
     
-    // Feedbacks
+    // Feedbacks - anyone authenticated can submit
     Route::post('feedbacks', [FeedbackController::class, 'store']);
 });
 
-// Public routes
-Route::get('feedbacks', [FeedbackController::class, 'index']);
-
-// Cart routes (client only)
-Route::middleware(['auth:sanctum', 'client.only'])->group(function () {
-    Route::apiResource('cart', CartController::class)->only(['index', 'store', 'update', 'destroy']);
-    Route::delete('cart/clear', [CartController::class, 'clear']);
-});
+// Legacy booking routes (keeping for backward compatibility)
+// These work without authentication for public booking
+Route::get('bookings', [BookingsController::class, 'index']);
+Route::post('bookings', [BookingsController::class, 'store']);
+Route::get('bookings/{booking}', [BookingsController::class, 'show']);
+Route::put('bookings/{booking}', [BookingsController::class, 'update']);
+Route::delete('bookings/{booking}', [BookingsController::class, 'destroy']);
