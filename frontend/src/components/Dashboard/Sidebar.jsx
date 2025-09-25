@@ -35,8 +35,10 @@ function Sidebar() {
         <nav className="d-flex flex-column flex-shrink-0 p-4 bg-dark text-white shadow" style={{ width: '250px', height: '100vh', position: 'fixed', top: 0, left: 0 }}>
             {/* Header */}
             <div className="d-flex align-items-center justify-content-center mb-4 pb-3 border-bottom border-secondary">
-                <h4 className="mb-0 text-uppercase "><i className="bi bi-speedometer2 me-2"></i>Dashboard</h4>
-            </div>
+    <h4 className="mb-0 text-uppercase text-white">
+        <i className="bi bi-speedometer2 me-2"></i>Dashboard
+    </h4>
+</div>
 
             {/* Navigation links */}
             <ul className="nav nav-pills flex-column mb-auto">

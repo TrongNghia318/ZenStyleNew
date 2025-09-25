@@ -18,8 +18,6 @@ Route::get('/user', function (Request $request) {
 // Public product routes (everyone can view - including guests)
 Route::get('products', [InventoryController::class, 'index']);
 Route::get('products/{id}', [InventoryController::class, 'show']);
-Route::put('orders/{id}', [OrderController::class, 'update']);
-
 
 // Public routes
 Route::get('feedbacks', [FeedbackController::class, 'index']);
@@ -66,9 +64,10 @@ Route::middleware(['auth:sanctum', 'role:admin,receptionist,stylist'])->group(fu
     // Booking management - all staff can manage
     Route::apiResource('bookings', BookingsController::class);
     
-    // Order viewing - all staff can view orders
+    // Order management - all staff can view and update orders
     Route::get('orders', [OrderController::class, 'index']);
     Route::get('orders/{id}', [OrderController::class, 'show']);
+    Route::put('orders/{id}', [OrderController::class, 'update']);
     
     // User management (admin/receptionist only)
     Route::middleware('role:admin,receptionist')->group(function () {

@@ -210,7 +210,7 @@ export default function Login() {
           </div>
 
           <div className="d-flex justify-content-between mb-3">
-            <Link to="/signup" className="text-decoration-none">Sign up</Link>
+            <Link to="/client/register" className="text-decoration-none">Sign up</Link>
             <Link to="/forgot-password" className="text-decoration-none">Forgot password?</Link>
           </div>
 

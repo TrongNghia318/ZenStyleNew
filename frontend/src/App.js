@@ -12,6 +12,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ProductDetail from "./pages/ProductDetail";
 import Checkout from "./pages/Checkout";
+import ClientRegister from "./pages/ClientRegister";
 
 // Service booking pages
 import Haircut from "./pages/page_Sevice/Haircut";
@@ -23,7 +24,6 @@ import SkinCare from "./pages/page_Sevice/SkinCare";
 
 // Admin/Dashboard pages
 import AdminProductCreate from "./pages/AdminProductCreate";
-
 import ServicesPage from "./pages/Dashboard_pages/ServicesPage";
 import UsersManagement from "./pages/Dashboard_pages/UsersManagement";
 import ProductsManagement from "./pages/Dashboard_pages/ProductsManagement";
@@ -47,6 +47,7 @@ function App() {
           <Route path="contact" element={<Contact />} />
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<Signup />} />
+          <Route path="client/register" element={<ClientRegister />} />
 
           {/* Service booking routes */}
           <Route path="services/haircut" element={<Haircut />} />
@@ -60,19 +61,18 @@ function App() {
           <Route path="admin/products/create" element={<AdminProductCreate />} />
         </Route>
 
-        Dashboard routes with dashboard layout
+        {/* Dashboard routes with dashboard layout */}
         <Route path="/dashboard" element={
           <ProtectedRoute requireStaff={true}>
             <DashboardLayout />
           </ProtectedRoute>
         }>
-          {/* <Route index element={<DashboardHome />} /> */}
           <Route path="services" element={<ServicesPage />} />
           <Route path="users" element={<UsersManagement />} />
           <Route path="products" element={<ProductsManagement />} />
           <Route path="products/:id" element={<DashboardProductDetail />} />
           <Route path="products/create" element={<DashboardProductCreate />} />
-          <Route path="/dashboard/orders" element={<OrderTracking />} />
+          <Route path="orders" element={<OrderTracking />} />
         </Route>
 
         {/* 404 route */}

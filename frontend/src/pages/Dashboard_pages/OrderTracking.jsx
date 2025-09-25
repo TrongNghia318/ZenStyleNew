@@ -187,7 +187,7 @@ function OrderTracking() {
                             Refreshing...
                         </>
                     ) : (
-                        <>🔄 Refresh</>
+                        <>Refresh</>
                     )}
                 </button>
             </div>
