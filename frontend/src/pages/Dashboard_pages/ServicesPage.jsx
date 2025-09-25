@@ -201,7 +201,7 @@ function ServicesManagement() {
                                                         <small>{booking.phone}</small>
                                                     </td>
                                                     <td>
-                                                        <span className="badge bg-primary">{booking.service}</span>
+                                                        <span className="badge bg-success">{booking.service}</span>
                                                     </td>
                                                     <td>{booking.stylist}</td>
                                                     <td>

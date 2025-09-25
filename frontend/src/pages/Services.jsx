@@ -1,58 +1,31 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const servicesData = [
-  { 
-    id: 'haircut',
-    img: "haircut.png", 
-    title: "Haircut",
-    description: "Professional hair cutting and styling services by our expert stylists.",
-    price: "$25 - $75",
-    duration: "45 min"
-  },
-  { 
-    id: 'makeup',
-    img: "makeup.png", 
-    title: "Makeup",
-    description: "Professional makeup application for all occasions and events.",
-    price: "$40 - $120",
-    duration: "60 min"
-  },
-  { 
-    id: 'manicure',
-    img: "manicure.png", 
-    title: "Manicure",
-    description: "Complete nail care including shaping, polishing, and nail art.",
-    price: "$20 - $50",
-    duration: "30 min"
-  },
-  { 
-    id: 'pedicure',
-    img: "pedicure.png", 
-    title: "Pedicure",
-    description: "Relaxing foot care treatment with massage and nail beautification.",
-    price: "$25 - $60",
-    duration: "45 min"
-  },
-  { 
-    id: 'massage',
-    img: "massage.png", 
-    title: "Massage",
-    description: "Therapeutic massage treatments for relaxation and wellness.",
-    price: "$50 - $150",
-    duration: "60-90 min"
-  },
-  { 
-    id: 'skincare',
-    img: "skin-care.png", 
-    title: "Skin Care",
-    description: "Facial treatments and skincare services for healthy, glowing skin.",
-    price: "$45 - $200",
-    duration: "75 min"
-  },
+  { id: 'haircut', img: "haircut.png", title: "Haircut", description: "Professional hair cutting and styling services by our expert stylists.", price: "$25 - $75", duration: "45 min" },
+  { id: 'makeup', img: "makeup.png", title: "Makeup", description: "Professional makeup application for all occasions and events.", price: "$40 - $120", duration: "60 min" },
+  { id: 'manicure', img: "manicure.png", title: "Manicure", description: "Complete nail care including shaping, polishing, and nail art.", price: "$20 - $50", duration: "30 min" },
+  { id: 'pedicure', img: "pedicure.png", title: "Pedicure", description: "Relaxing foot care treatment with massage and nail beautification.", price: "$25 - $60", duration: "45 min" },
+  { id: 'massage', img: "massage.png", title: "Massage", description: "Therapeutic massage treatments for relaxation and wellness.", price: "$50 - $150", duration: "60-90 min" },
+  { id: 'skincare', img: "skin-care.png", title: "Skin Care", description: "Facial treatments and skincare services for healthy, glowing skin.", price: "$45 - $200", duration: "75 min" },
 ];
 
 export default function Services() {
+  const navigate = useNavigate();
+
+  // Hàm xử lý khi bấm Book Now
+  const handleBooking = (serviceId) => {
+    const token = localStorage.getItem("auth_token");
+
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    //   link booking form 
+    navigate(`/services/${serviceId}`);
+  };
+
   return (
     <>
       <div className="container-fluid bg-light page-header py-5 mb-5">
@@ -74,10 +47,9 @@ export default function Services() {
           </div>
           
           <div className="row g-4">
-            {servicesData.map((service, index) => (
+            {servicesData.map((service) => (
               <div className="col-md-6 col-lg-4" key={service.id}>
                 <div className="service-item h-100 p-4 border rounded shadow-sm position-relative overflow-hidden">
-                  {/* Service Image */}
                   <div className="text-center mb-4">
                     <img 
                       className="img-fluid" 
@@ -87,14 +59,10 @@ export default function Services() {
                     />
                   </div>
                   
-                  {/* Service Info */}
                   <div className="text-center">
                     <h3 className="mb-3 text-primary">{service.title}</h3>
-                    <p className="mb-3 text-muted">
-                      {service.description}
-                    </p>
+                    <p className="mb-3 text-muted">{service.description}</p>
                     
-                    {/* Service Details */}
                     <div className="row g-2 mb-4">
                       <div className="col-6">
                         <div className="bg-light p-2 rounded">
@@ -110,21 +78,17 @@ export default function Services() {
                       </div>
                     </div>
                     
-                    {/* Action Buttons */}
                     <div className="d-grid gap-2">
-                      <Link 
+                      <button 
                         className="btn btn-primary btn-lg"
-                        to={`/services/${service.id}`}
+                        onClick={() => handleBooking(service.id)}
                       >
                         <i className="bi bi-calendar-plus me-2"></i>
                         Book Now
-                      </Link>
-                      
-                      
+                      </button>
                     </div>
                   </div>
                   
-                  {/* Decorative Element */}
                   <div 
                     className="position-absolute top-0 end-0 bg-primary" 
                     style={{
@@ -137,72 +101,6 @@ export default function Services() {
                 </div>
               </div>
             ))}
-          </div>
-          
-          {/* Call to Action Section */}
-          <div className="row mt-5">
-            <div className="col-12">
-              <div className="bg-primary text-white p-5 rounded text-center">
-                <h2 className="mb-3">Ready to Transform Your Look?</h2>
-                <p className="mb-4 lead">
-                  Book multiple services and save! Our expert team is here to provide you 
-                  with a complete beauty experience tailored to your needs.
-                </p>
-                <div className="row justify-content-center">
-                  <div className="col-auto">
-                    <Link to="/contact" className="btn btn-light btn-lg me-3">
-                      <i className="bi bi-telephone me-2"></i>
-                      Call Us: +012 345 67890
-                    </Link>
-                  </div>
-                  <div className="col-auto">
-                    <Link to="/services/haircut" className="btn btn-outline-light btn-lg">
-                      <i className="bi bi-calendar-heart me-2"></i>
-                      Book Your First Service
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Additional Info Section */}
-          <div className="row mt-5">
-            <div className="col-lg-8 mx-auto text-center">
-              <div className="bg-light p-4 rounded">
-                <h4 className="text-primary mb-3">Why Choose ZenStyle?</h4>
-                <div className="row g-3">
-                  <div className="col-md-3">
-                    <div className="p-3">
-                      <i className="bi bi-award text-primary fs-2 mb-2"></i>
-                      <h6>Expert Staff</h6>
-                      <small className="text-muted">Certified professionals</small>
-                    </div>
-                  </div>
-                  <div className="col-md-3">
-                    <div className="p-3">
-                      <i className="bi bi-clock text-primary fs-2 mb-2"></i>
-                      <h6>Flexible Hours</h6>
-                      <small className="text-muted">Open 7 days a week</small>
-                    </div>
-                  </div>
-                  <div className="col-md-3">
-                    <div className="p-3">
-                      <i className="bi bi-shield-check text-primary fs-2 mb-2"></i>
-                      <h6>Safe & Clean</h6>
-                      <small className="text-muted">Sanitized equipment</small>
-                    </div>
-                  </div>
-                  <div className="col-md-3">
-                    <div className="p-3">
-                      <i className="bi bi-heart text-primary fs-2 mb-2"></i>
-                      <h6>Customer Care</h6>
-                      <small className="text-muted">Your satisfaction first</small>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
