@@ -109,7 +109,7 @@ function DashboardProductDetail() {
       }
     } catch (error) {
       console.error('Error updating product:', error);
-      alert('Network error. Please try again.');
+      alert('Lack of information.');
     } finally {
       setSaving(false);
     }

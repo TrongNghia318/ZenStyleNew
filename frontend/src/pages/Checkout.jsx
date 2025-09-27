@@ -132,7 +132,7 @@ function Checkout() {
       }
     } catch (err) {
       console.error(err);
-      setMessage("Error: Unable to connect to server");
+      setMessage("Error: Please type correct Email");
     } finally {
       setLoading(false);
     }

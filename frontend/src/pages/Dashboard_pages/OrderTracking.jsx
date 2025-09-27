@@ -7,6 +7,9 @@ function OrderTracking() {
     const [filterStatus, setFilterStatus] = useState('All');
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [dateRange, setDateRange] = useState('all'); // all, today, week, month, custom
+    const [customStartDate, setCustomStartDate] = useState('');
+    const [customEndDate, setCustomEndDate] = useState('');
     const ordersPerPage = 10;
 
     // Fixed container style to prevent sidebar overlap
@@ -109,8 +112,11 @@ function OrderTracking() {
     const getStatusColor = (status) => {
         switch (status?.toLowerCase()) {
             case 'pending': return 'warning';
+            case 'confirmed': return 'info';
+            case 'processing': return 'primary';
+            case 'shipped': return 'secondary';
+            case 'delivered': return 'success';
             case 'cancelled': return 'danger';
-            case 'paid': return 'success';
             default: return 'light';
         }
     };
@@ -126,12 +132,48 @@ function OrderTracking() {
         });
     };
 
-    const calculateTotal = (items) => {
-        if (!items || !Array.isArray(items)) return 0;
-        return items.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
+    const getDateRangeFilter = () => {
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        
+        switch (dateRange) {
+            case 'today':
+                return {
+                    start: today,
+                    end: new Date(today.getTime() + 24 * 60 * 60 * 1000)
+                };
+            case 'week':
+                const weekStart = new Date(today);
+                weekStart.setDate(today.getDate() - today.getDay()); // Start of current week (Sunday)
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekStart.getDate() + 7);
+                return { start: weekStart, end: weekEnd };
+            case 'month':
+                const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+                const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+                return { start: monthStart, end: monthEnd };
+            case 'custom':
+                if (customStartDate && customEndDate) {
+                    const start = new Date(customStartDate);
+                    const end = new Date(customEndDate);
+                    end.setHours(23, 59, 59, 999); // Include the entire end date
+                    return { start, end };
+                }
+                return null;
+            default:
+                return null;
+        }
     };
 
-    // Filter and search logic with safety checks
+    const isDateInRange = (orderDate) => {
+        const range = getDateRangeFilter();
+        if (!range) return true;
+        
+        const date = new Date(orderDate);
+        return date >= range.start && date <= range.end;
+    };
+
+    // Filter and search logic with safety checks and date filtering
     const filteredOrders = Array.isArray(orders) ? orders.filter(order => {
         const matchesStatus = filterStatus === 'All' || order.status === filterStatus;
         const matchesSearch = !searchTerm || 
@@ -139,8 +181,35 @@ function OrderTracking() {
             order.client?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             order.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             order.order_id?.toString().includes(searchTerm);
-        return matchesStatus && matchesSearch;
+        const matchesDate = isDateInRange(order.order_date);
+        return matchesStatus && matchesSearch && matchesDate;
     }) : [];
+
+    // Calculate totals for filtered orders
+    const calculateFilteredTotals = () => {
+        return {
+            total: filteredOrders.length,
+            pending: filteredOrders.filter(o => o.status === 'pending').length,
+            paid: filteredOrders.filter(o => o.status === 'paid').length,
+            cancelled: filteredOrders.filter(o => o.status === 'cancelled').length,
+            revenue: filteredOrders
+                .filter(o => o.status === 'paid')
+                .reduce((sum, order) => sum + parseFloat(order.total_price || 0), 0)
+                .toFixed(2)
+        };
+    };
+
+    const totals = calculateFilteredTotals();
+
+    const getDateRangeLabel = () => {
+        switch (dateRange) {
+            case 'today': return 'Today';
+            case 'week': return 'This Week';
+            case 'month': return 'This Month';
+            case 'custom': return 'Custom Range';
+            default: return 'All Time';
+        }
+    };
 
     // Pagination
     const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
@@ -187,7 +256,7 @@ function OrderTracking() {
                             Refreshing...
                         </>
                     ) : (
-                        <>Refresh</>
+                        <>🔄 Refresh</>
                     )}
                 </button>
             </div>
@@ -198,7 +267,7 @@ function OrderTracking() {
                     <div className="card shadow-sm">
                         <div className="card-body">
                             <div className="row g-3">
-                                <div className="col-md-4">
+                                <div className="col-md-3">
                                     <label className="form-label">Filter by Status:</label>
                                     <select 
                                         className="form-select"
@@ -214,19 +283,79 @@ function OrderTracking() {
                                         <option value="cancelled">Cancelled</option>
                                     </select>
                                 </div>
-                                <div className="col-md-8">
-                                    <label className="form-label">Search Orders:</label>
-                                    <input 
-                                        type="text"
-                                        className="form-control"
-                                        placeholder="Search by order ID, customer name, or email..."
-                                        value={searchTerm}
+                                <div className="col-md-3">
+                                    <label className="form-label">Date Range:</label>
+                                    <select 
+                                        className="form-select"
+                                        value={dateRange}
                                         onChange={(e) => {
-                                            setSearchTerm(e.target.value);
+                                            setDateRange(e.target.value);
                                             setCurrentPage(1);
                                         }}
-                                    />
+                                    >
+                                        <option value="all">All Time</option>
+                                        <option value="today">Today</option>
+                                        <option value="week">This Week</option>
+                                        <option value="month">This Month</option>
+                                        <option value="custom">Custom Range</option>
+                                    </select>
                                 </div>
+                                {dateRange === 'custom' && (
+                                    <>
+                                        <div className="col-md-2">
+                                            <label className="form-label">Start Date:</label>
+                                            <input 
+                                                type="date"
+                                                className="form-control"
+                                                value={customStartDate}
+                                                onChange={(e) => {
+                                                    setCustomStartDate(e.target.value);
+                                                    setCurrentPage(1);
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="col-md-2">
+                                            <label className="form-label">End Date:</label>
+                                            <input 
+                                                type="date"
+                                                className="form-control"
+                                                value={customEndDate}
+                                                onChange={(e) => {
+                                                    setCustomEndDate(e.target.value);
+                                                    setCurrentPage(1);
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="col-md-2">
+                                            <label className="form-label">Search:</label>
+                                            <input 
+                                                type="text"
+                                                className="form-control"
+                                                placeholder="Search orders..."
+                                                value={searchTerm}
+                                                onChange={(e) => {
+                                                    setSearchTerm(e.target.value);
+                                                    setCurrentPage(1);
+                                                }}
+                                            />
+                                        </div>
+                                    </>
+                                )}
+                                {dateRange !== 'custom' && (
+                                    <div className="col-md-6">
+                                        <label className="form-label">Search Orders:</label>
+                                        <input 
+                                            type="text"
+                                            className="form-control"
+                                            placeholder="Search by order ID, customer name, or email..."
+                                            value={searchTerm}
+                                            onChange={(e) => {
+                                                setSearchTerm(e.target.value);
+                                                setCurrentPage(1);
+                                            }}
+                                        />
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -236,7 +365,7 @@ function OrderTracking() {
             {/* Orders Summary */}
             <div className="row mb-4">
                 <div className="col-md-3">
-                    <div className="card bg-info text-white">
+                    <div className="card bg-primary text-white">
                         <div className="card-body text-center">
                             <h3>{Array.isArray(orders) ? orders.length : 0}</h3>
                             <p className="mb-0">Total Orders</p>

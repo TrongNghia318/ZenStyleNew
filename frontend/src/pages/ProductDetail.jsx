@@ -149,7 +149,7 @@ function ProductDetail() {
       }
     } catch (error) {
       console.error('Error updating product:', error);
-      alert('Network error. Please try again.');
+      alert('Lack of information.');
     } finally {
       setSaving(false);
     }
@@ -279,7 +279,7 @@ function ProductDetail() {
       }
     } catch (error) {
       console.error('Error deleting product:', error);
-      alert('Network error. Please try again.');
+      alert('Lack of information.');
     }
   };
   //Add to cart
@@ -315,7 +315,7 @@ function ProductDetail() {
       }
     } catch (error) {
       console.error('Error adding to cart:', error);
-      alert('Network error. Please try again.');
+      alert('Lack of information.');
     }
   };
 
