@@ -19,7 +19,7 @@ Route::get('/user', function (Request $request) {
 Route::get('products', [InventoryController::class, 'index']);
 Route::get('products/{id}', [InventoryController::class, 'show']);
 
-// Public routes
+// Public reviews routes
 Route::get('feedbacks', [FeedbackController::class, 'index']);
 
 // User authentication (for staff members)
