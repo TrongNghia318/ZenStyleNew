@@ -63,20 +63,7 @@ export default function Services() {
                     <h3 className="mb-3 text-primary">{service.title}</h3>
                     <p className="mb-3 text-muted">{service.description}</p>
                     
-                    <div className="row g-2 mb-4">
-                      <div className="col-6">
-                        <div className="bg-light p-2 rounded">
-                          <small className="text-muted d-block">Price Range</small>
-                          <strong className="text-primary">{service.price}</strong>
-                        </div>
-                      </div>
-                      <div className="col-6">
-                        <div className="bg-light p-2 rounded">
-                          <small className="text-muted d-block">Duration</small>
-                          <strong className="text-primary">{service.duration}</strong>
-                        </div>
-                      </div>
-                    </div>
+                    
                     
                     <div className="d-grid gap-2">
                       <button 
