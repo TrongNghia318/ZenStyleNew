@@ -112,12 +112,9 @@ function OrderTracking() {
     const getStatusColor = (status) => {
         switch (status?.toLowerCase()) {
             case 'pending': return 'warning';
-            case 'confirmed': return 'info';
-            case 'processing': return 'primary';
-            case 'shipped': return 'secondary';
-            case 'delivered': return 'success';
+            case 'paid': return 'info';
             case 'cancelled': return 'danger';
-            default: return 'light';
+            default: return 'success';
         }
     };
 
@@ -256,7 +253,7 @@ function OrderTracking() {
                             Refreshing...
                         </>
                     ) : (
-                        <>🔄 Refresh</>
+                        <>Refresh</>
                     )}
                 </button>
             </div>
@@ -365,7 +362,7 @@ function OrderTracking() {
             {/* Orders Summary */}
             <div className="row mb-4">
                 <div className="col-md-3">
-                    <div className="card bg-primary text-white">
+                    <div className="card bg-info text-white">
                         <div className="card-body text-center">
                             <h3>{Array.isArray(orders) ? orders.length : 0}</h3>
                             <p className="mb-0">Total Orders</p>
@@ -392,7 +389,7 @@ function OrderTracking() {
                     <div className="card bg-success text-white">
                         <div className="card-body text-center">
                             <h3>{Array.isArray(orders) ? orders.filter(o => o.status === 'paid').length : 0}</h3>
-                            <p className="mb-0">Paid</p>
+                            <p className="mb-0 ">Paid</p>
                         </div>
                     </div>
                 </div>
